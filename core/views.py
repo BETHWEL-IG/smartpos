@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from . forms import ProductForm
-from . models import Product
+from . forms import ProductForm, SaleForm
+from . models import Product,Sale
 
 # Create your views here.
 
@@ -42,3 +42,57 @@ def delete_product(request, pk):
         product.delete()
         return redirect('product_list')
     return render(request, 'core/confirm_delete.html', {'product': product})
+
+
+# add sale
+def add_sale(request):
+    if request.method == 'POST':
+        form = SaleForm(request.POST)
+        if form.is_valid():
+            try:
+                form.save()
+                return redirect('sale_list')
+            except ValueError as e:
+                form.add_error('quantity', str(e))
+    else:
+        form = SaleForm()
+    return render(request, 'core/add_sale.html', {'form': form})
+
+# view sales
+def sale_list(request):
+    sales = Sale.objects.select_related('product').all()
+    return render(request, 'core/sale_list.html', {'sales': sales})
+
+
+# update sale
+def update_sale(request, pk):
+    sale = get_object_or_404(Sale, pk=pk)
+    old_quantity = sale.quantity
+    if request.method == 'POST':
+        form = SaleForm(request.POST, instance=sale)
+        if form.is_valid():
+            try:
+                # Reverse previous stock adjustment
+                sale.product.stock += old_quantity
+                sale.product.save()
+                
+                # Save the updated sale
+                form.save()
+                return redirect('sale_list')
+            except ValueError as e:
+                form.add_error('quantity', str(e))
+    else:
+        form = SaleForm(instance=sale)
+    return render(request, 'core/add_sale.html', {'form': form})
+
+
+# delete sale
+def delete_sale(request, pk):
+    sale = get_object_or_404(Sale, pk=pk)
+    if request.method == 'POST':
+        # Restore stock
+        sale.product.stock += sale.quantity
+        sale.product.save()
+        sale.delete()
+        return redirect('sale_list')
+    return render(request, 'core/confirm_delete.html', {'sale': sale})

@@ -1,0 +1,12 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{% if form.instance.pk %}Edit Sale{% else %}Add Sale{% endif %}</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Update Sale{% else %}Add Sale{% endif %}</button>
+    </form>
+</div>
+{% endblock %}
