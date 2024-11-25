@@ -7,6 +7,7 @@ urlpatterns = [
     path('products/', views.product_list, name='product_list'),
     path('products/update/<int:pk>/', views.update_product, name='update_product'),
     path('products/delete/<int:pk>/', views.delete_product, name='delete_product'),
+    path('report/', views.sales_report, name='sales-report'),
 
 # sales crud
     path('sales/', views.sale_list, name='sale_list'),

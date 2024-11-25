@@ -1,0 +1,69 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Sales Report</h2>
+    
+    <!-- Filter Form -->
+    <form method="get" class="row g-3">
+        <div class="col-md-3">
+            <label for="start_date" class="form-label">Start Date</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date }}">
+        </div>
+        <div class="col-md-3">
+            <label for="end_date" class="form-label">End Date</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date }}">
+        </div>
+        <div class="col-md-3">
+            <label for="product_id" class="form-label">Product</label>
+            <select id="product_id" name="product_id" class="form-select">
+                <option value="">All Products</option>
+                {% for product in products %}
+                    <option value="{{ product.id }}" {% if product.id|stringformat:"s" == product_id %}selected{% endif %}>
+                        {{ product.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+    </form>
+
+    <!-- Summary Section -->
+    <div class="mt-4">
+        <h4>Summary</h4>
+        <p>Total Sales: {{ total_sales|floatformat:2 }}</p>
+        <p>Total Quantity Sold: {{ total_quantity }}</p>
+    </div>
+
+    <!-- Detailed Table -->
+    <div class="mt-4">
+        <h4>Sales Details</h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sales %}
+                    <tr>
+                        <td>{{ sale.created_at|date:"Y-m-d" }}</td>
+                        <td>{{ sale.product.name }}</td>
+                        <td>{{ sale.quantity }}</td>
+                        <td>{{ sale.total_price|floatformat:2 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No sales found for the selected filters.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

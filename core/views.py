@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from . forms import ProductForm, SaleForm
 from . models import Product,Sale
+from django.db.models import Sum
 
 # Create your views here.
 
@@ -96,3 +97,42 @@ def delete_sale(request, pk):
         sale.delete()
         return redirect('sale_list')
     return render(request, 'core/confirm_delete.html', {'sale': sale})
+
+
+# report
+from .models import Product
+
+def sales_report(request):
+    # Fetch filters
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    product_id = request.GET.get('product_id')
+
+    # Base query
+    sales = Sale.objects.all()
+
+    # Apply filters
+    if start_date:
+        sales = sales.filter(created_at__gte=start_date)
+    if end_date:
+        sales = sales.filter(created_at__lte=end_date)
+    if product_id:
+        sales = sales.filter(product__id=product_id)
+
+    # Aggregate data
+    total_sales = sales.aggregate(total=Sum('total_price'))['total'] or 0
+    total_quantity = sales.aggregate(total=Sum('quantity'))['total'] or 0
+
+    # Get all products for the dropdown
+    products = Product.objects.all()
+
+    # Render template
+    return render(request, 'core/report.html', {
+        'sales': sales,
+        'total_sales': total_sales,
+        'total_quantity': total_quantity,
+        'start_date': start_date,
+        'end_date': end_date,
+        'product_id': product_id,
+        'products': products,
+    })
