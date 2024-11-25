@@ -14,3 +14,10 @@ SmartPOS is a Django-based web application designed to provide small business ow
 
 ## Target Users
 Small to medium-sized businesses in underserved areas.
+
+![Home](assets/img1.jpg)
+![Add Sale](assets/img2.jpg)
+![Add Product](assets/img3.jpg)
+![Product List](assets/img4.jpg)
+![Sales](assets/img5.jpg)
+
