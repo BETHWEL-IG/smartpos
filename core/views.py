@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from . forms import ProductForm
+from . models import Product
 
 # Create your views here.
 
@@ -15,3 +16,7 @@ def add_product(request):
     else:
         form = ProductForm()
     return render(request, 'core/add_product.html', {'form': form})
+
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'core/product_list.html', {'products': products})
